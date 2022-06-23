@@ -23,7 +23,7 @@ fn ask_player() -> Option<usize> {
 
 fn main() {
     let mut board = game::Board::new();
-    let best_ai = ai::minimax::MinimaxAI::new(&board);
+    let best_ai = ai::random::RandomAI::new(&board);
     let mut player_turn = true;
     loop {
         let column: Option<usize> = match player_turn {
