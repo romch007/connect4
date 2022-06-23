@@ -64,11 +64,9 @@ impl Board {
     }
 
     /// Check if a specific column is full
-    pub fn is_column_full(&self, column: usize) -> Result<bool, String> {
+    pub fn is_column_full(&self, column: usize) -> Result<bool, &'static str> {
         let column = match column.cmp(&WIDTH) {
-            Ordering::Equal | Ordering::Greater => {
-                return Err(format!("Column {} is out of the board", column.to_string()))
-            }
+            Ordering::Equal | Ordering::Greater => return Err("Column out of board"),
             Ordering::Less => column,
         };
         for row in self.grid.iter() {
@@ -81,7 +79,7 @@ impl Board {
     }
 
     /// Check if the whole board is full
-    pub fn is_full(&self) -> Result<bool, String> {
+    pub fn is_full(&self) -> Result<bool, &'static str> {
         for i in 0..WIDTH {
             let value = self.is_column_full(i)?;
             if value {
@@ -91,9 +89,9 @@ impl Board {
         return Ok(true);
     }
 
-    pub fn play(&mut self, column: usize) -> Result<(), String> {
+    pub fn play(&mut self, column: usize) -> Result<(), &'static str> {
         if self.is_column_full(column)? {
-            return Err(String::from("Column is full"));
+            return Err("Column is full");
         }
 
         let mut current_row = 0;
