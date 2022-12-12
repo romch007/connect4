@@ -23,7 +23,7 @@ fn ask_player() -> Option<usize> {
 
 fn main() {
     let mut board = game::Board::new();
-    let best_ai = ai::random::RandomAI::new(&board);
+    let best_ai = ai::random::RandomAI::new();
     let mut player_turn = true;
     loop {
         let column: Option<usize> = match player_turn {
@@ -33,7 +33,7 @@ fn main() {
             }
             false => {
                 player_turn = true;
-                Some(best_ai.choose_column())
+                Some(best_ai.choose_column(&board))
             }
         };
 
@@ -42,7 +42,10 @@ fn main() {
             None => continue,
         };
 
-        board.play(column).unwrap();
+        match board.play(column) {
+            Ok(_) => (),
+            Err(_) => continue,
+        }
         println!("{}", board);
 
         match board.winner() {
@@ -52,6 +55,12 @@ fn main() {
             }
             None => (),
         };
+
+        if board.is_full() {
+            println!("It's a draw!");
+            break;
+        }
+
         board.switch_player();
     }
 }

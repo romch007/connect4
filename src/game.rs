@@ -24,6 +24,7 @@ const WIDTH: usize = 7;
 const HEIGHT: usize = 6;
 
 /// Connect4 board
+#[derive(Clone)]
 pub struct Board {
     pub current_player: Player,
     pub grid: [[Option<Player>; WIDTH]; HEIGHT],
@@ -42,7 +43,7 @@ impl fmt::Display for Board {
             }
             writeln!(f, "")?;
         }
-        return Ok(());
+        Ok(())
     }
 }
 
@@ -69,24 +70,15 @@ impl Board {
             Ordering::Equal | Ordering::Greater => return Err("Column out of board"),
             Ordering::Less => column,
         };
-        for row in self.grid.iter() {
-            match row[column] {
-                None => return Ok(false),
-                Some(_) => (),
-            }
-        }
-        return Ok(true);
+        Ok(self.grid.iter().all(|row| match row[column] {
+            None => false,
+            Some(_) => true,
+        }))
     }
 
     /// Check if the whole board is full
-    pub fn is_full(&self) -> Result<bool, &'static str> {
-        for i in 0..WIDTH {
-            let value = self.is_column_full(i)?;
-            if value {
-                return Ok(false);
-            }
-        }
-        return Ok(true);
+    pub fn is_full(&self) -> bool {
+        (0..WIDTH).all(|i| self.is_column_full(i).unwrap())
     }
 
     pub fn play(&mut self, column: usize) -> Result<(), &'static str> {
@@ -109,15 +101,15 @@ impl Board {
         self.grid[free_row][column] = Some(self.current_player);
         self.last_position_played = (free_row, column);
 
-        return Ok(());
+        Ok(())
     }
 
     fn get_winner_from_segment(&self, segment: &[(usize, usize); 4]) -> Option<Player> {
         let cells: Vec<Option<Player>> = segment.iter().map(|(y, x)| self.grid[*y][*x]).collect();
         if utils::is_all_same(&cells) {
-            return cells[0];
+            cells[0]
         } else {
-            return None;
+            None
         }
     }
 
@@ -131,7 +123,7 @@ impl Board {
             row += 1;
             col -= 1;
         }
-        return (row, col);
+        (row, col)
     }
 
     fn start_backward_slash(
@@ -144,7 +136,7 @@ impl Board {
             row += 1;
             col += 1;
         }
-        return (row, col);
+        (row, col)
     }
 
     pub fn winner(&self) -> Option<Player> {
@@ -220,6 +212,18 @@ impl Board {
             }
         }
 
-        return None;
+        None
+    }
+
+    pub fn children(&self) -> Vec<Self> {
+        let mut result: Vec<Self> = Vec::new();
+        for i in 0..WIDTH {
+            if !self.is_column_full(i).unwrap() {
+                let mut new_board = (*self).clone();
+                new_board.play(i).unwrap();
+                result.push(new_board);
+            }
+        }
+        result
     }
 }

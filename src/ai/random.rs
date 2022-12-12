@@ -1,21 +1,19 @@
 use crate::{ai, game};
 use rand::Rng;
 
-pub struct RandomAI<'a> {
-    board: &'a game::Board,
-}
+pub struct RandomAI {}
 
-impl<'a> RandomAI<'a> {
-    pub fn new(board: &'a game::Board) -> Self {
-        Self { board: board }
+impl RandomAI {
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
-impl<'a> ai::AI for RandomAI<'a> {
-    fn choose_column(&self) -> usize {
+impl ai::AI for RandomAI {
+    fn choose_column(&self, board: &game::Board) -> usize {
         loop {
             let nb: usize = rand::thread_rng().gen_range(0..6);
-            if self.board.is_column_full(nb).unwrap() {
+            if board.is_column_full(nb).unwrap() {
                 continue;
             }
             break nb;

@@ -1,17 +1,30 @@
 use crate::{ai, game};
 
-pub struct MinimaxAI<'a> {
-    board: &'a game::Board,
-}
+pub struct MinimaxAI {}
 
-impl<'a> MinimaxAI<'a> {
-    pub fn new(board: &'a game::Board) -> Self {
-        Self { board: board }
+impl MinimaxAI {
+    pub fn new() -> Self {
+        Self {}
     }
+
+    fn heuristic(&self, board: &game::Board) -> i64 {
+        match board.winner() {
+            Some(winner) => {
+                if winner == current_player {
+                    1000
+                } else {
+                    -1000
+                }
+            }
+            None => 0,
+        }
+    }
+
+    fn minimax(&self, board: &game::Board, depth: u32) -> (i64, usize) {}
 }
 
-impl<'a> ai::AI for MinimaxAI<'a> {
-    fn choose_column(&self) -> usize {
-        return 0;
+impl ai::AI for MinimaxAI {
+    fn choose_column(&self, board: &game::Board) -> usize {
+        0
     }
 }
