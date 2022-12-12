@@ -1,6 +1,6 @@
 use crate::game;
 
-// pub mod minimax;
+pub mod minimax;
 pub mod random;
 
 pub trait AI {

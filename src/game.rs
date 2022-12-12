@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::utils;
 use std::cmp::Ordering;
 use std::fmt;
@@ -22,6 +24,7 @@ impl fmt::Display for Player {
 
 const WIDTH: usize = 7;
 const HEIGHT: usize = 6;
+const WINNER_SCORE_EVALUATION: f64 = 100000.0;
 
 /// Connect4 board
 #[derive(Clone)]
@@ -79,6 +82,19 @@ impl Board {
     /// Check if the whole board is full
     pub fn is_full(&self) -> bool {
         (0..WIDTH).all(|i| self.is_column_full(i).unwrap())
+    }
+
+    /// Get possible moves (columns)
+    pub fn possible_moves(&self) -> Vec<usize> {
+        let mut possibles_moves = Vec::new();
+
+        for col in 0..WIDTH {
+            if !self.is_column_full(col).unwrap() {
+                possibles_moves.push(col);
+            }
+        }
+
+        possibles_moves
     }
 
     pub fn play(&mut self, column: usize) -> Result<(), &'static str> {
@@ -215,15 +231,21 @@ impl Board {
         None
     }
 
-    pub fn children(&self) -> Vec<Self> {
-        let mut result: Vec<Self> = Vec::new();
-        for i in 0..WIDTH {
-            if !self.is_column_full(i).unwrap() {
-                let mut new_board = (*self).clone();
-                new_board.play(i).unwrap();
-                result.push(new_board);
+    /// Static evaluation of the board
+    pub fn evaluate_board(&self) -> f64 {
+        match self.winner() {
+            Some(winner) => {
+                WINNER_SCORE_EVALUATION
+                    * match winner {
+                        Player::Red => 1.0,
+                        Player::Yellow => -1.0,
+                    }
+            }
+            None => {
+                // TODO: static board evaluation
+                let mut rng = rand::thread_rng();
+                rng.gen()
             }
         }
-        result
     }
 }
